@@ -558,6 +558,7 @@ export default {
         return
       }
 
+      // Add interval to replace not working scroll when overflow is set
       this.scrollInterval = setInterval(this.handleScrollPosition, 100)
     },
 
@@ -582,9 +583,12 @@ export default {
 
     addListeners () {
       this.listenerTarget = this.getListenerTarget()
-      this.listenerTarget.addEventListener('scroll', this.handleScroll, supportsPassive ? {
-        passive: true,
-      } : false)
+      if (!this.isOverflow) {
+        this.listenerTarget.addEventListener('scroll', this.handleScroll, supportsPassive ? {
+          passive: true,
+        } : false)
+      }
+
       this.listenerTarget.addEventListener('resize', this.handleResize)
     },
 
@@ -593,7 +597,10 @@ export default {
         return
       }
 
-      this.listenerTarget.removeEventListener('scroll', this.handleScroll)
+      if (!this.isOverflow) {
+        this.listenerTarget.removeEventListener('scroll', this.handleScroll)
+      }
+
       this.listenerTarget.removeEventListener('resize', this.handleResize)
 
       this.listenerTarget = null
