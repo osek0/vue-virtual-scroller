@@ -116,6 +116,11 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    isOverflow: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data () {
@@ -124,6 +129,8 @@ export default {
       totalSize: 0,
       ready: false,
       hoverKey: null,
+      previousScrollPosition: 0,
+      scrollInterval: null,
     }
   },
 
@@ -203,6 +210,7 @@ export default {
 
   beforeDestroy () {
     this.removeListeners()
+    this.removeScrollInterval()
   },
 
   methods: {
@@ -538,9 +546,38 @@ export default {
     applyPageMode () {
       if (this.pageMode) {
         this.addListeners()
+        this.addScrollInterval()
       } else {
         this.removeListeners()
+        this.removeScrollInterval()
       }
+    },
+
+    addScrollInterval () {
+      if (!this.isOverflow) {
+        return
+      }
+
+      this.scrollInterval = setInterval(this.handleScrollPosition, 100)
+    },
+
+    removeScrollInterval () {
+      if (!this.isOverflow) {
+        return
+      }
+
+      clearInterval(this.scrollInterval)
+    },
+
+    handleScrollPosition () {
+      console.log('Bump!')
+      const scrollPosition = window.scrollY
+      if (scrollPosition === this.previousScrollPosition) {
+        return
+      }
+
+      this.previousScrollPosition = scrollPosition
+      this.handleScroll()
     },
 
     addListeners () {
